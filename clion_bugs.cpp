@@ -9,6 +9,7 @@ class Slice {
  public:
   Slice() = default;
   template <size_t N>
+  // todo:
   Slice(const char (&a)[N]) : size(N) {  // Can't resolve variable N
   }
   size_t size;
@@ -16,6 +17,7 @@ class Slice {
 void f_slice(Slice slice) {
 }
 void bug_slice() {
+  // https://youtrack.jetbrains.com/issue/CPP-7860#comment=27-1677997
   f_slice("hello");  // Parameter type mismatch: Types 'Slice' and 'const char[6]' are not compatible
 }
 
@@ -24,9 +26,11 @@ template <class FunctionT>
 void operator+(ScopeExit, FunctionT &&func) {
 }
 void bug_scope_exit() {
+  // https://youtrack.jetbrains.com/issue/CPP-3585
   ScopeExit() + [&] {};  // Binary operator '+' can't be applied to the expression of type ScopeExit and 'void (*)()'
 }
 
+// https://youtrack.jetbrains.com/issue/CPP-5883
 class SfinaeBug {
  public:
   template <class T>
@@ -39,6 +43,7 @@ class SfinaeBug {
   }
 };
 
+// todo:
 void bug_class_in_function_() {
   class A {
    public:
@@ -52,6 +57,7 @@ void bug_class_in_function_() {
   };
 }
 
+// https://youtrack.jetbrains.com/issue/CPP-9277
 class BugClassInFunctionInClass {
  public:
  private:
@@ -89,6 +95,7 @@ class ClassWithoutDefaultConstructor {
 
 class ClassFieldWithoutDefaultConstructor {
  public:
+  // https://youtrack.jetbrains.com/issue/CPP-2168
   ClassFieldWithoutDefaultConstructor() {  // field without_default must be initialized
   }
 
@@ -96,17 +103,20 @@ class ClassFieldWithoutDefaultConstructor {
   ClassWithoutDefaultConstructor without_default{nullptr};
 };
 
+// https://youtrack.jetbrains.com/issue/CPP-1547
 void bug_lamda_with_default_argument() {
   auto f = [](int a, int b = 1) {};
   f(1);  // Too few arguments, expected 2
 };
 
+// https://youtrack.jetbrains.com/issue/CPP-9587 (?)
 void bug_lambda_return_string() {
   auto f = [] {
     return std::string("hello");  // Returning 'std::basic_string...' from lambda returning 'void'
   };
 }
 
+// https://youtrack.jetbrains.com/issue/CPP-8649 (fixed in master)
 void bug_vector() {
   std::vector<int> a(1);
   std::vector<int> b;
